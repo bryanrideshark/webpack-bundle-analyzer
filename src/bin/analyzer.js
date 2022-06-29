@@ -112,17 +112,8 @@ if (!bundleDir) bundleDir = dirname(bundleStatsFile);
 
 
 
-async function runAnalyzer() {
-  let bundleStats;
-
-try {
-  bundleStats = await analyzer.readStatsFromFile(bundleStatsFile);
-} catch (err) {
-  logger.error(`Couldn't read webpack bundle stats from "${bundleStatsFile}":\n${err}`);
-  logger.debug(err.stack);
-  process.exit(1);
-}
-
+function runAnalyzer(bundleStats) {
+  
 if (mode === 'server') {
   viewer.startServer(bundleStats, {
     openBrowser,
@@ -155,7 +146,13 @@ if (mode === 'server') {
 
 }
 
-runAnalyzer();
+analyzer.readStatsFromFile(bundleStatsFile).then((stats) => {
+  runAnalyzer(stats);
+}, () => {
+  logger.error(`Couldn't read webpack bundle stats from "${bundleStatsFile}":\n${err}`);
+  logger.debug(err.stack);
+  process.exit(1);
+})
 
 function showHelp(error) {
   if (error) console.log(`\n  ${magenta(error)}\n`);

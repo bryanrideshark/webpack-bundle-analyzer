@@ -170,7 +170,8 @@ function readStatsFromFile(filename) {
       const parsed = JSON.parse(fs.readFileSync(filename, "utf8"));
       resolve(parsed);
       return;
-    } catch {
+    } catch (e) {
+      console.log('Parsing file failed - attempting to parse with bfj', e);
       const bfj = require("bfj");
       bfj.read(filename).then((data) => {
         resolve(data);
