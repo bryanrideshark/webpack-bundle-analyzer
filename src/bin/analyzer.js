@@ -110,9 +110,13 @@ bundleStatsFile = resolve(bundleStatsFile);
 
 if (!bundleDir) bundleDir = dirname(bundleStatsFile);
 
-let bundleStats;
+
+
+async function runAnalyzer() {
+  let bundleStats;
+
 try {
-  bundleStats = analyzer.readStatsFromFile(bundleStatsFile);
+  bundleStats = await analyzer.readStatsFromFile(bundleStatsFile);
 } catch (err) {
   logger.error(`Couldn't read webpack bundle stats from "${bundleStatsFile}":\n${err}`);
   logger.debug(err.stack);
@@ -148,6 +152,10 @@ if (mode === 'server') {
     logger: new Logger(logLevel)
   });
 }
+
+}
+
+runAnalyzer();
 
 function showHelp(error) {
   if (error) console.log(`\n  ${magenta(error)}\n`);

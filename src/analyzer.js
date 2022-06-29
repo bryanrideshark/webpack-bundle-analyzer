@@ -8,6 +8,7 @@ const Logger = require('./Logger');
 const Folder = require('./tree/Folder').default;
 const {parseBundle} = require('./parseUtils');
 const {createAssetsFilter} = require('./utils');
+const { RSA_NO_PADDING } = require('constants');
 
 const FILENAME_QUERY_REGEXP = /\?.*$/u;
 const FILENAME_EXTENSIONS = /\.(js|mjs)$/iu;
@@ -161,10 +162,21 @@ function getViewerData(bundleStats, bundleDir, opts) {
   }));
 }
 
+
+
 function readStatsFromFile(filename) {
-  return JSON.parse(
-    fs.readFileSync(filename, 'utf8')
-  );
+  return new Promise((resolve, reject) => {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(filename, "utf8"));
+      resolve(parsed);
+      return;
+    } catch {
+      const bfj = require("bfj");
+      bfj.read(filename).then((data) => {
+        resolve(data);
+      }, reject);
+    }
+  });
 }
 
 function getChildAssetBundles(bundleStats, assetName) {
